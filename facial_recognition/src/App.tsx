@@ -9,6 +9,7 @@ function App() {
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const [modelsLoaded, setModelsLoaded] = useState(false);
   const [isWebcamOn, setIsWebcamOn] = useState(false);
   const [facesData, setFacesData] = useState<any[]>([]);
 
@@ -19,11 +20,16 @@ function App() {
       await faceapi.nets.ageGenderNet.loadFromUri(MODEL_URL);
       await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
       await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
+      setModelsLoaded(true);
     };
     loadModels();
   }, []);
 
   const startWebcam = async () => {
+    if (!modelsLoaded) {
+      alert("Models are still loading. Please wait a moment.");
+      return;
+    }
     setIsWebcamOn(true);
     const stream = await navigator.mediaDevices.getUserMedia({ video: true });
     if (videoRef.current) {
